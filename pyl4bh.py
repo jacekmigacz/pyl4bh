@@ -1,11 +1,13 @@
 import operator
 
 top_level_symbols = {
-    't': True,
     '+': operator.add,
     '-': operator.sub,
     '*': operator.mul,
     '/': operator.floordiv,
+    't': True,
+    '>=': operator.ge,
+    '<=': operator.le,
 }
 
 
@@ -60,7 +62,8 @@ def evaluate(expression, local_symbols=top_level_symbols):
 
 
 # text = "(defun mypow(x)(* x x))(+ 1 (mypow (* 10 (mypow 40))))"
-text = "(if t 10 1)"
+# text = "(if t 10 1)"
+text = "(if (<= 10 9) 1 0)"
 tokens = tokenize(text)
 print(f"tokens: {tokens}")
 while tokens:
