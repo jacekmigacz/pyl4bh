@@ -1,5 +1,12 @@
 import operator
 
+
+class Function:
+    def __init__(self, arguments, body):
+        self.arguments = arguments
+        self.body = body
+
+
 symbols = {
     '+': operator.add,
     '-': operator.sub,
@@ -9,7 +16,7 @@ symbols = {
 
 
 def tokenize(text):
-    return text.replace('(', '( ').replace(')', ' )').split()
+    return text.replace('(', ' ( ').replace(')', ' ) ').split()
 
 
 def parse(tokens):
@@ -34,13 +41,18 @@ def resolve(expression):
 def evaluate(expression):
     if isinstance(expression, int):
         return expression
-    symbol = resolve(expression[0])
-    arguments = [evaluate(argument) for argument in expression[1:]]
-    return symbol(*arguments)
+    elif expression[0] == 'defun':
+        (_, NAME, ARGLIST, BODY) = expression
+        symbols[NAME] = Function(ARGLIST, BODY)
+    else:
+        symbol = resolve(expression[0])
+        arguments = [evaluate(argument) for argument in expression[1:]]
+        return symbol(*arguments)
 
 
-text = "(+ 1 (+ (* 10 20) 1))"
+text = "(defun mypow(x)(* x x))(+ 1 (+ (* 10 20) 1))"
 tokens = tokenize(text)
 ast = parse(tokens)
 retval = evaluate(ast)
+breakpoint()
 print(retval)
