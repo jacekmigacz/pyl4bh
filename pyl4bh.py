@@ -6,6 +6,9 @@ class Function:
         self.arguments = arguments
         self.body = body
 
+    def __call__(self):
+        return evaluate(self.body)
+
 
 symbols = {
     '+': operator.add,
@@ -20,6 +23,7 @@ def tokenize(text):
 
 
 def parse(tokens):
+    print(f"tokens: {tokens}")
     token = tokens.pop(0)
     if token == '(':
         branch = []
@@ -50,9 +54,14 @@ def evaluate(expression):
         return symbol(*arguments)
 
 
-text = "(defun mypow(x)(* x x))(+ 1 (+ (* 10 20) 1))"
+text = "(defun mypow(x)(* x x))(+ 1 (mypow (* 10 20) 1))"
 tokens = tokenize(text)
-ast = parse(tokens)
-retval = evaluate(ast)
-breakpoint()
-print(retval)
+# print(tokens)
+while tokens:
+    ast = parse(tokens)
+print(ast)
+# retval = evaluate(ast)
+# print(retval)
+
+# https://medium.com/python-pandemonium/function-as-objects-in-python-d5215e6d1b0d
+# https://dbader.org/blog/python-lambda-functions
