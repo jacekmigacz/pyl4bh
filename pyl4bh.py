@@ -1,6 +1,7 @@
 import operator
 
 top_level_symbols = {
+    't': True,
     '+': operator.add,
     '-': operator.sub,
     '*': operator.mul,
@@ -48,13 +49,18 @@ def evaluate(expression, local_symbols=top_level_symbols):
     elif expression[0] == 'defun':
         (_, NAME, ARGLIST, BODY) = expression
         top_level_symbols[NAME] = Function(ARGLIST, BODY)
+    elif expression[0] == 'if':
+        (_, COND, THEN, ELSE) = expression
+        print(f"COND={COND}, THEN={THEN}, ELSE={ELSE}")
+        return evaluate(THEN if evaluate(COND, local_symbols) else ELSE, local_symbols)
     else:
         symbol = local_symbols.get(expression[0])
         arguments = [evaluate(argument, local_symbols) for argument in expression[1:]]
         return symbol(*arguments)
 
 
-text = "(defun mypow(x)(* x x))(+ 1 (mypow (* 10 20)))"
+# text = "(defun mypow(x)(* x x))(+ 1 (mypow (* 10 (mypow 40))))"
+text = "(if t 10 1)"
 tokens = tokenize(text)
 print(f"tokens: {tokens}")
 while tokens:
