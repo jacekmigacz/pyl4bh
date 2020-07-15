@@ -1,21 +1,23 @@
 import operator
 
-
-class Function:
-    def __init__(self, arguments, body):
-        self.arguments = arguments
-        self.body = body
-
-    def __call__(self):
-        return evaluate(self.body)
-
-
-symbols = {
+top_level_symbols = {
     '+': operator.add,
     '-': operator.sub,
     '*': operator.mul,
     '/': operator.floordiv,
 }
+
+
+class Function:
+    def __init__(self, arguments, body):
+        self.arguments = arguments
+        self.body = body
+        print(f"*FUNCTION*: args={arguments}, body={body}")
+
+    def __call__(self, *arguments):
+        local_symbols = dict(zip(self.arguments, arguments))
+        local_symbols.update(top_level_symbols)
+        return evaluate(self.body, local_symbols)
 
 
 def tokenize(text):
@@ -37,23 +39,22 @@ def parse(tokens):
             return token
 
 
-def resolve(expression):
-    return symbols.get(expression)
-
-
-def evaluate(expression):
+def evaluate(expression, local_symbols=top_level_symbols):
+    print(f"type={type(expression)}, expression={expression}, local_symbols={local_symbols}")
     if isinstance(expression, int):
         return expression
+    elif isinstance(expression, str):
+        return local_symbols[expression]
     elif expression[0] == 'defun':
         (_, NAME, ARGLIST, BODY) = expression
-        symbols[NAME] = Function(ARGLIST, BODY)
+        top_level_symbols[NAME] = Function(ARGLIST, BODY)
     else:
-        symbol = resolve(expression[0])
-        arguments = [evaluate(argument) for argument in expression[1:]]
+        symbol = local_symbols.get(expression[0])
+        arguments = [evaluate(argument, local_symbols) for argument in expression[1:]]
         return symbol(*arguments)
 
 
-text = "(defun mypow(x)(* x x))(+ 1 (* (* 10 20) 1))"
+text = "(defun mypow(x)(* x x))(+ 1 (mypow (* 10 20)))"
 tokens = tokenize(text)
 print(f"tokens: {tokens}")
 while tokens:
@@ -61,4 +62,3 @@ while tokens:
     print(f"AST: {ast}")
     retval = evaluate(ast)
 print(retval)
-breakpoint()
