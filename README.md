@@ -1,4 +1,5 @@
 # pyl4bh - minimal LISP interpreter
+![](logo.png)
 
 Provides commmand-line interpreter for minimal lisp with basic ALU, conditionals, functions and recursion.
 
