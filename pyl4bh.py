@@ -1,3 +1,4 @@
+import argparse
 import operator
 import unittest
 
@@ -105,6 +106,7 @@ def lisp(text):
 
 
 class TestLisp(unittest.TestCase):
+    """Basic self-test."""
     def test_boolean(self):
         self.assertEqual(lisp("(+ (and 1 1) (+ (and 0 1) (+ (and 1 0) (and 0 0))))"), 1)
         self.assertEqual(lisp("(+ (or 1 1) (+ (or 0 1) (+ (or 1 0) (or 0 0))))"), 3)
@@ -121,5 +123,12 @@ class TestLisp(unittest.TestCase):
         self.assertEqual(lisp("(defun f(x) (if (<= x 4) x (f(- x 1))))(f (* 10 10))"), 4)
 
 
-if __name__ == '__main__':
-    unittest.main(verbosity=2)
+parser = argparse.ArgumentParser(description='Interpret LISP.', epilog="Remember it is minimal by design!")
+parser.add_argument('text', help="Lisp source code.", action='store', type=str)
+args = parser.parse_args()
+
+if args.text == '(self-test)':
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(TestLisp)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+else:
+    print(lisp(args.text))
